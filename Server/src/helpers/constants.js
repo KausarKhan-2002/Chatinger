@@ -1,0 +1,1 @@
+export const JWT_SIGN = "chatinger_signature";
