@@ -21,9 +21,7 @@ export const useAuth = () => {
 
       const user = response.data.user;
 
-      const localObj = { id: user.id, name: user.name, email: user.email };
-
-      localStorage.setItem("userData", JSON.stringify(localObj));
+      localStorage.setItem("userData", JSON.stringify(user));
       navigate("/")
     } catch (err) {
       console.log(err.message);
