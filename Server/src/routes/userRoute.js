@@ -79,7 +79,7 @@ router.post("/login", async (req, res) => {
 
     const { password: _, ...userData } = user._doc;
 
-    sendCookie(user._id, res)
+    sendCookie(user._id, res);
 
     res.status(200).json({
       success: true,
@@ -133,9 +133,10 @@ router.get("/user", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/user-list", async (req, res) => {
+router.get("/user-list", authMiddleware, async (req, res) => {
   try {
-    const users = await User.find();
+    const userId = req.user._id;
+    const users = await User.find({ _id: { $ne: userId } });
 
     res.status(200).json({
       success: true,
