@@ -7,6 +7,7 @@ import { useEffect } from "react";
 
 const App = () => {
   const profile =useProfile()
+  // localStorage.removeItem("msgAlert")
 
   useEffect(() => {
     profile()

@@ -23,14 +23,15 @@ function RightPanel() {
   const handleSubmit = (e) => {
     e.preventDefault();
     sendMessage(text, selectedUser._id, isSound);
-  //     console.log(allMessages);
+    //     console.log(allMessages);
 
-    if (profile && selectedUser?._id) {
-      socket.emit("userIds", {
-        senderId: profile._id,
-        recieverId: selectedUser._id,
-      });
-    }
+    // if (profile && selectedUser?._id) {
+    //   socket.emit("userIds", {
+    //     senderId: profile._id,
+    //     recieverId: selectedUser._id,
+    //   });
+    // }
+
     const senderNewMsg = {
       senderId: profile._id,
       recieverId: selectedUser._id,
@@ -46,16 +47,67 @@ function RightPanel() {
     }
   }, [messages]);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("newMsg", (newMsg) => {
-        // const sound = new Audio(recieveNoti)
-        // sound.play()
-        setAllMessages((prev) => [...prev, newMsg]);
-      });
+  const handleNewMsg = (newMsg) => {
+    // const sound = new Audio(recieveNoti)
+    // sound.play()
+
+    const msgAlert = JSON.parse(localStorage.getItem("msgAlert"));
+
+    if (msgAlert && msgAlert.length) {
+      let updatedMsgAlert;
+
+      const existingInd = msgAlert.findIndex(
+        (msg) => msg.senderId === newMsg.senderId
+      );
+
+      if (existingInd !== -1) {
+        updatedMsgAlert = msgAlert.map((msg, ind) =>
+          ind === existingInd
+            ? { ...msg, count: msg.count + 1, text: (msg.text = newMsg.text) }
+            : msg
+        );
+      } else {
+        updatedMsgAlert = [...msgAlert, { ...newMsg, count: 1 }];
+      }
+
+      console.log("from newMsg:", newMsg.senderId);
+      console.log("from msgAlert:", newMsg.senderId);
+
+      localStorage.setItem("msgAlert", JSON.stringify(updatedMsgAlert));
+    } else {
+      const newMsgAlert = [
+        {
+          senderId: newMsg.senderId,
+          recieverId: newMsg.recieverId,
+          text: newMsg.text,
+          count: 1,
+        },
+      ];
+
+      localStorage.setItem("msgAlert", JSON.stringify(newMsgAlert));
+
+      // console.log(msgAlert);
     }
 
-    return () => socket && socket.off("newMsg");
+    // console.log(newMsg);
+
+    setAllMessages((prev) => [...prev, newMsg]);
+
+    // socket.on("msgAlert", (msg) => {
+    //   console.log("msgAlert", msg);
+    // }
+  };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newMsg", handleNewMsg);
+      socket.on("msgAlert", (msg) => console.log(msg));
+    }
+
+    return () => {
+      socket && socket.off("newMsg");
+      socket && socket.off("msgAlert");
+    };
   }, [socket]);
 
   useEffect(() => {

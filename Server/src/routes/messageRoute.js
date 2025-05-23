@@ -27,8 +27,9 @@ router.post("/send/:recieverId", authMiddleware, async (req, res) => {
 
     const recieverSocketID = getRecieverSocketID(recieverId);
 
-    if (recieverSocketID) {     
-      io.to(recieverSocketID).emit("newMsg", message)
+    if (recieverSocketID) {
+      io.to(recieverSocketID).emit("newMsg", message);
+      io.emit("msgAlert", message);
     }
 
     res.status(201).json({

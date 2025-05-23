@@ -10,15 +10,23 @@ function UserList({ onClose }) {
   const [active, setActive] = useState("");
   const allMessages = useMessages();
   const { onlineUserIds, offline } = useSocket();
+  const [renderNotification, setRenderNotification] = useState(false);
+  const msgAlertArr = JSON.parse(localStorage.getItem("msgAlert"));
 
-
-  // console.log(offline);
+  // console.log(msgAlertArr);
 
   const handleClick = (user) => {
     allMessages(user._id);
     onClose();
     setActive(user._id);
     setSelectedUser(user);
+
+    if (msgAlertArr && msgAlertArr?.length) {
+      const filterMsgAlert = msgAlertArr.filter(
+        (msg) => msg.senderId !== user._id
+      );
+      localStorage.setItem("msgAlert", JSON.stringify(filterMsgAlert));
+    }
   };
 
   function formatLastSeen(lastSeen) {
@@ -39,6 +47,12 @@ function UserList({ onClose }) {
   useEffect(() => {
     userList();
   }, []);
+
+  useEffect(() => {
+    setRenderNotification(!renderNotification);
+  }, [msgAlertArr]);
+
+  // console.log(renderNotification);
 
   if (!users)
     return <h2 className="text-white text-center mt-4">Loading...</h2>;
@@ -61,7 +75,19 @@ function UserList({ onClose }) {
             )}
           </h3>
 
-          <div>
+          <div className="flex gap-2 items-center px-5">
+            {msgAlertArr &&
+              msgAlertArr.map(
+                (msg, ind) =>
+                  msg.senderId === user._id && (
+                    <p
+                      key={ind}
+                      className="absolute bg-lime-600 w-5 min-h-5 text-sm font-medium rounded-full flex justify-center items-center"
+                    >
+                      {msg.count}
+                    </p>
+                  )
+              )}
             {offline.map(
               (status) =>
                 status.userId === user._id && (
