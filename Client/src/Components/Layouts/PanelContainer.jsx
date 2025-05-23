@@ -9,12 +9,9 @@ function PanelContainer() {
 
   return (
     <div className="w-screen h-screen bg-slate-700 flex justify-center items-center px-10 text-white">
-      <div className="relative flex w-full lg:w-[95%] h-[90vh] bg-slate-800 overflow-hidden">
+      <div className="relative flex w-full lg:w-[95%] h-[80vh] lg:h-[90vh] bg-slate-800 overflow-hidden">
         <SidebarToggle onOpen={() => setIsSidebar(true)} />
-        <LeftPanel
-          isSidebar={isSidebar}
-          onClose={() => setIsSidebar(false)}
-        />
+        <LeftPanel isSidebar={isSidebar} onClose={() => setIsSidebar(false)} />
         <RightPanel />
       </div>
     </div>
