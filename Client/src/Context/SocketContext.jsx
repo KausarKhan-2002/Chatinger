@@ -14,6 +14,8 @@ const SocketProvider = ({ children }) => {
     if (profile) {
       const socket = io(BASE_URL, {
         query: {
+          transports: ['websocket'],
+          secure: true,
           userId: profile._id,
         },
       });
